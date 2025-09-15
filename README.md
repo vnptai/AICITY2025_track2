@@ -13,8 +13,6 @@ pip install -e .
 pip install flash-attn --no-build-isolation
 ```
 
-## structures
-
 ### Data Preparation
 
 Firstly change the directory to `data_preprocess` and create the `data` directory.
