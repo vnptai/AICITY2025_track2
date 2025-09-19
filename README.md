@@ -1,13 +1,12 @@
-# Gen Caption
+# Domain-Aware Enhancements to Vision-Language Models for Urban Traffic Safety Question Answering
 
 ## Prepare
-
 1. Install Package
 
 ```Shell
 conda create -n cityllava python=3.10 -y
 conda activate cityllava
-cd AICITY2024_Track2_AliOpenTrek_CityLLaVA/
+cd AICITY2025_track2/
 pip install --upgrade pip  # enable PEP 660 support
 pip install -e .
 pip install flash-attn --no-build-isolation
@@ -111,7 +110,9 @@ After the execution, the folder structure should be like this:
 │   │   └── wts_bdd_val.json
 │   ├──best_view_for_test.json
 │   └──perspective_test_images.json
-└── ... # python and shell scripts
+└── test_processed_anno
+│   ├── frame_bbox_anno
+... # python and shell scripts
 ```
 
 Then the processed annotations could be found under `./processed_anno`, and the train json is:
@@ -134,6 +135,24 @@ Now you can do inference on WTS_TEST_SET:
 bash scripts/inference.sh
 ```
 
-## Acknowledgement
+## Question-Answering
 
-- This repos is built with reference to the code and model of the following projects: [CityLLaVA](https://github.com/alibaba/AICITY2024_Track2_AliOpenTrek_CityLLaVA). Thanks for their awesome work!
+### Training
+We use `ms-swift` to train Vision-Language Models. The processed data will be fed into framework then trained on labeled data. The example shown in `qa/examples/sft.py`
+
+### Inference
+After fine-tuning, we run inference on the test split using the QA inference pipeline.
+The inference entry point is `qa/infer_qa.py`, which has been refactored to support argument parsing.
+
+First, serving VLM checkpoints:
+```
+MODEL="OpenGVLab/InternVL3-78B" #CHECKPOINT_PATH
+
+lmdeploy serve api_server $MODEL --chat-template internvl2_5 --server-port 23333 --tp 8
+```
+
+We provide a ready-to-use shell script:
+```
+bash qa/examples/infer_qa.py
+```
+
